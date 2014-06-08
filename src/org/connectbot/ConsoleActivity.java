@@ -757,7 +757,7 @@ public class ConsoleActivity extends Activity {
 				urlDialog.setTitle(R.string.console_menu_urlscan);
 
 				ListView urlListView = new ListView(ConsoleActivity.this);
-				URLItemListener urlListener = new URLItemListener(ConsoleActivity.this);
+				URLItemListener urlListener = new URLItemListener(ConsoleActivity.this, urlDialog);
 				urlListView.setOnItemClickListener(urlListener);
 
 				urlListView.setAdapter(new ArrayAdapter<String>(ConsoleActivity.this, android.R.layout.simple_list_item_1, urls));
@@ -1052,9 +1052,11 @@ public class ConsoleActivity extends Activity {
 
 	private class URLItemListener implements OnItemClickListener {
 		private WeakReference<Context> contextRef;
+		private WeakReference<Dialog> dialogRef;
 
-		URLItemListener(Context context) {
+		URLItemListener(Context context, Dialog dialog) {
 			this.contextRef = new WeakReference<Context>(context);
+			this.dialogRef = new WeakReference<Dialog>(dialog);
 		}
 
 		public void onItemClick(AdapterView<?> arg0, View view, int position, long id) {
@@ -1072,6 +1074,9 @@ public class ConsoleActivity extends Activity {
 
 				Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
 				context.startActivity(intent);
+				Dialog dialog = dialogRef.get();
+				if (dialog != null)
+					dialog.dismiss();
 			} catch (Exception e) {
 				Log.e(TAG, "couldn't open URL", e);
 				// We should probably tell the user that we couldn't find a handler...
